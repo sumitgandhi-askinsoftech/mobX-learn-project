@@ -37,6 +37,7 @@ class ObservableTodoList {
     todo =[];
 
     currentTodoText="";
+    currentTaskDescription="";
 
     constructor (){
         const savedTodos = localStorage.getItem("todos");
@@ -44,8 +45,10 @@ class ObservableTodoList {
         makeObservable(this,{
             todo:observable,
             currentTodoText:observable,
+            currentTaskDescription:observable,
             addTask:action,
             taskCompletedToggle:action,
+            setCurrentTodoText:action,
             completedTaskCount:computed,
         });
         // autorun(() => {
@@ -57,7 +60,15 @@ class ObservableTodoList {
     get completedTaskCount (){
         return this.todo?.filter(task=>task?.isCompleted)?.length || 0;
     }
-    
+    setCurrentTodoText (text){
+        this.currentTodoText = text?.trim() ||"";
+    }
+
+    resetTask (){
+        this.todo =[];
+        this.currentTodoText ="";
+        localStorage.removeItem("todos");
+    }
     taskCompletedToggle(id){
         this.todo.map((item)=>{
             if(id === item?.id){
@@ -71,7 +82,8 @@ class ObservableTodoList {
         this.todo.push({
             id: Date.now(),
             name:this.currentTodoText?.trim(),
-            isCompleted:false
+            isCompleted:false,
+            descripton: this.currentTaskDescription?.trim() || "",
         })
         this.currentTodoText ="";
         return;
@@ -80,9 +92,9 @@ class ObservableTodoList {
 
 export const todoList= new ObservableTodoList();
 
-autorun(() => {
-    localStorage.setItem("todos", JSON.stringify(todoList.todo));
-    if (todoList.todo.length > 0) {
-      console.log("First item:", todoList.todo[0]);
-    }
-  });
+// autorun(() => {
+//     localStorage.setItem("todos", JSON.stringify(todoList.todo));
+//     if (todoList.todo.length > 0) {
+//       console.log("First item:", todoList.todo[0]);
+//     }
+//   });
